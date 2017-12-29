@@ -79,6 +79,7 @@
 <div id="root"></div>
 <script type="text/babel">
 
+    //Header component top left part. static
     class Header extends React.Component {
 
         render(){
@@ -92,6 +93,7 @@
         }
     }
 
+    //Top right part of the header icon image. static
     class Hicon extends React.Component {
 
         render(){
@@ -102,6 +104,7 @@
         }
     }
 
+    //question part goes here
     class Question extends React.Component {
         constructor(props) {
             super(props);
@@ -114,10 +117,9 @@
         componentDidUpdate() {
 
         }
+        //after six seconds question changes. for re-rendering dom of question part. dynamic
         componentWillReceiveProps(nextProps) {
-
             this.setState({question: nextProps.question});
-
         }
 
         render(){
@@ -129,6 +131,7 @@
         }
     }
 
+    //After question part there is an instruction. Static part
     class Instruction extends React.Component {
 
         render(){
@@ -142,25 +145,31 @@
             );
         }
     }
-
+    //four choices goes here. dynamic
     class Choice extends React.Component{
 
         constructor(props) {
             super(props);
-            this.state = {isToggleOn: true, selectCount:0};
+            this.state = {isToggleOn: false, selectCount:0};
             this.handleClick = this.handleClick.bind(this);
         }
 
+//on click color change and trigger increase or decrease count upon click
         handleClick() {
             this.setState(prevState => ({
                 isToggleOn: !prevState.isToggleOn
-            }));
-            console.log(this.state.isToggleOn);
-            this.props.onIncreaseCount();
+            }
+            ),this.decision);
         }
-
+        decision(){
+            if(this.state.isToggleOn){
+                this.props.increaseCount()
+            }else {
+                this.props.decreaseCount()
+            }
+        }
         render(){
-            let bgColor = this.state.isToggleOn ? "white" : "green"
+            let bgColor = this.state.isToggleOn ? "green" : "white"
             return (
                 <div className="col-md-6 text-center btn-div">
                     <a style={{backgroundColor: bgColor}} onClick={this.handleClick} type="button" className="btn" href="#">{this.props.option}</a>
@@ -173,7 +182,8 @@
         constructor(props) {
             super(props);
             this.state = {count:0,choices : this.props.choices };
-            this.increaseCount = this.increaseCount.bind(this);
+            this.onIncreaseCount = this.onIncreaseCount.bind(this);
+            this.onDecreaseCount = this.onDecreaseCount.bind(this);
         }
 
         componentDidMount(){
@@ -184,19 +194,31 @@
             this.setState({choices: nextProps.choices});
         }
 
-        increaseCount(){
+        onIncreaseCount(){
+            console.log('increase count')
             this.setState(prevState=>({
-                count: prevState.count+1
-            }));
+                count: prevState.count + 1
+            }),this.decision)
+        }
+        onDecreaseCount(){
+            console.log('decrease count')
+            this.setState(prevState=>({
+                count: prevState.count - 1
+            }),this.decision)
+        }
+
+        decision(){
+            console.log('count from decision', this.state.count)
             if(this.state.count == 2){
-                console.log('kam sarse');
+                console.log('no returning back')
+                this.props.gotoNextQuestion()
             }
         }
 
         render(){
             var choices =this.state.choices;
             const listitem = choices.map((name, index) => {
-                return(<Choice onIncreaseCount={this.increaseCount} key={index} option={name} />);
+                return(<Choice increaseCount={this.onIncreaseCount} decreaseCount={this.onDecreaseCount} key={index} option={name} />);
             });
 
             return (
@@ -206,27 +228,13 @@
             );
         }
     }
-    //<Choice onIncreaseCount={this.increaseCount} option="Krass" />
-    //<Choice option="Einfach" />
-    //   <Choice option="Dazu" />
-    //   <Choice option="Dafur" />
-    // <div className="col-md-6 text-center btn-div">{}
-    //     <a type="button" className="btn" href="#">Krass</a>
-    // </div>
-    // <div className="col-md-6 text-center btn-div">
-    //     <a type="button" className="btn" href="#">Einfach</a>
-    // </div>
-    // <div className="col-md-6 text-center btn-div">
-    //     <a type="button" className="btn" href="#">Dazu</a>
-    //   </div>
-    //     <div className="col-md-6 text-center btn-div">
-    //         <a type="button" className="btn" href="#">Dafur</a>
-    //     </div>
+
     class App extends React.Component {
 
         constructor(props) {
             super(props);
-            this.state = {data: [], current: 1};
+            this.state = {data: [], current: 1}
+            this.nextQuestion = this.nextQuestion.bind(this)
         }
 
         getInitialState() {
@@ -251,7 +259,7 @@
 
             this.timerID = setInterval(
                 () => this.tick(),
-                6000
+                10000
             );
         }
 
@@ -260,6 +268,21 @@
         }
 
         tick() {
+            this.setState(prevState=>({
+                current: prevState.current+1
+            }));
+            console.log(this.state.current)
+            var self = this;
+            axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
+                .then(response => {
+                        self.setState({
+                            data: response.data
+                        })
+                    }
+                )
+        }
+
+        nextQuestion(){
             this.setState(prevState=>({
                 current: prevState.current+1
             }));
@@ -288,9 +311,7 @@
                     </div>
                     <div className="row question-div"><Question  question={question} /></div>
                     <div className="row instruction-div"><Instruction  /></div>
-                    <div className="row choice-div"><Choices choices={choices} /></div>
-                    {question}
-
+                    <div className="row choice-div"><Choices choices={choices} gotoNextQuestion={this.nextQuestion} /></div>
                 </div>
 
             );
