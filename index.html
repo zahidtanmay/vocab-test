@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulows Wortschatz Test</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    .header{
+      border-bottom: 5px solid black;
+      margin-bottom: 20px;
+    }
+    .title-p{
+      padding-bottom: 0px !important;
+      margin-bottom: -10px;
+    }
+    .red-text{
+      font-size: 60px;
+      font-weight: bold;
+      color: red;
+    }
+    .black-text{
+      font-weight: bold;
+      font-size: 25px;
+    }
+    .green-text{
+      font-size: 35px;
+      font-weight: 600;
+      color: green;
+    }
+    .icon-image{
+      height: 50px;
+      float: right;
+    }
+    .icon-image-div{
+      padding-top: 25px;
+    }
+    .question-div{
+      background-color: aliceblue;
+      min-height: 20%;
+    }
+    .instruction-div{
+      background-color: goldenrod;
+      margin-top: 20px;
+    }
+    .choice-div{
+      margin-top: 30px;
+    }
+    .zero-padding{
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .btn-div{
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    .btn{
+      width: 80%;
+      font-weight: bold;
+      font-size: 30px;
+      color: black;
+    }
+    .btn:hover{
+      background-color: aquamarine;
+    }
+    .btn:focus{
+      box-shadow: 0 0 0 0 !important;
+      /*background-color: green;*/
+      /*color: white;*/
+    }
+
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+    class Header extends React.Component {
+
+        render(){
+            return (
+                <div className="col-md-8 col-sm-8 col-xs-8">
+                    <p className="title-p">
+                        <span className="red-text">B</span><span className="black-text">ulows</span> <span className="green-text">Wortshatztest</span>
+                    </p>
+                </div>
+            );
+        }
+    }
+
+    class Hicon extends React.Component {
+
+        render(){
+            return (
+                <div className="col-md-4 col-sm-4 col-xs-4 icon-image-div">
+                    <img className="icon-image" src="src/img/WT_icon5.png" alt="icon"/>
+                </div>);
+        }
+    }
+
+    class Question extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {question: this.props.question};
+        }
+
+        componentDidMount(){
+
+        }
+        componentDidUpdate() {
+
+        }
+        componentWillReceiveProps(nextProps) {
+
+            this.setState({question: nextProps.question});
+
+        }
+
+        render(){
+            return (
+                <div className="col-md-12 text-center">
+                    <h3 className="question-type">Welche beiden Worter passen gut zu:</h3>
+                    <h1 className="question">{this.state.question}</h1>
+                </div>);
+        }
+    }
+
+    class Instruction extends React.Component {
+
+        render(){
+            return (
+                <div className="col-md-12">
+                    <h4 className="attention-text">
+                        Wählen Sie Ihre zwei.
+                        [attention German Umlaut = auml]
+                    </h4>
+                </div>
+            );
+        }
+    }
+
+    class Choice extends React.Component{
+
+        constructor(props) {
+            super(props);
+            this.state = {isToggleOn: true, selectCount:0};
+            this.handleClick = this.handleClick.bind(this);
+        }
+
+        handleClick() {
+            this.setState(prevState => ({
+                isToggleOn: !prevState.isToggleOn
+            }));
+            console.log(this.state.isToggleOn);
+            this.props.onIncreaseCount();
+        }
+
+        render(){
+            let bgColor = this.state.isToggleOn ? "white" : "green"
+            return (
+                <div className="col-md-6 text-center btn-div">
+                    <a style={{backgroundColor: bgColor}} onClick={this.handleClick} type="button" className="btn" href="#">{this.props.option}</a>
+                </div>
+            );
+        }
+    }
+
+    class Choices extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {count:0,choices : this.props.choices };
+            this.increaseCount = this.increaseCount.bind(this);
+        }
+
+        componentDidMount(){
+
+        }
+
+        componentWillReceiveProps(nextProps) {
+            this.setState({choices: nextProps.choices});
+        }
+
+        increaseCount(){
+            this.setState(prevState=>({
+                count: prevState.count+1
+            }));
+            if(this.state.count == 2){
+                console.log('kam sarse');
+            }
+        }
+
+        render(){
+            var choices =this.state.choices;
+            const listitem = choices.map((name, index) => {
+                return(<Choice onIncreaseCount={this.increaseCount} key={index} option={name} />);
+            });
+
+            return (
+                <div className="col-md-12 row">
+                    {listitem}
+                </div>
+            );
+        }
+    }
+    //<Choice onIncreaseCount={this.increaseCount} option="Krass" />
+    //<Choice option="Einfach" />
+    //   <Choice option="Dazu" />
+    //   <Choice option="Dafur" />
+    // <div className="col-md-6 text-center btn-div">{}
+    //     <a type="button" className="btn" href="#">Krass</a>
+    // </div>
+    // <div className="col-md-6 text-center btn-div">
+    //     <a type="button" className="btn" href="#">Einfach</a>
+    // </div>
+    // <div className="col-md-6 text-center btn-div">
+    //     <a type="button" className="btn" href="#">Dazu</a>
+    //   </div>
+    //     <div className="col-md-6 text-center btn-div">
+    //         <a type="button" className="btn" href="#">Dafur</a>
+    //     </div>
+    class App extends React.Component {
+
+        constructor(props) {
+            super(props);
+            this.state = {data: [], current: 1};
+        }
+
+        getInitialState() {
+            console.log('initial state')
+            return {
+
+            };
+        }
+
+        componentDidMount() {
+            var self = this;
+
+            axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
+                .then(response => {
+                        self.setState({
+                            data: response.data
+                        })
+                    }
+                )
+
+
+
+            this.timerID = setInterval(
+                () => this.tick(),
+                6000
+            );
+        }
+
+        componentWillUnmount() {
+            clearInterval(this.timerID);
+        }
+
+        tick() {
+            this.setState(prevState=>({
+                current: prevState.current+1
+            }));
+            console.log(this.state.current)
+            var self = this;
+            axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
+                .then(response => {
+                        self.setState({
+                            data: response.data
+                        })
+                    }
+                )
+        }
+
+        render(){
+            let question = this.state.data.question
+            let choices = [this.state.data.choice_one, this.state.data.choice_two, this.state.data.choice_three, this.state.data.choice_four]
+            if(!Object.keys(this.state.data).length){
+                return null;
+            }
+            return (
+                <div className="container">
+                    <div className="row header">
+                        <Header />
+                        <Hicon/>
+                    </div>
+                    <div className="row question-div"><Question  question={question} /></div>
+                    <div className="row instruction-div"><Instruction  /></div>
+                    <div className="row choice-div"><Choices choices={choices} /></div>
+                    {question}
+
+                </div>
+
+            );
+        }
+    }
+
+    ReactDOM.render(
+        <App />,
+        document.getElementById('root')
+    );
+
+</script>
+<!--
+  Note: this page is a great way to try React but it's not suitable for production.
+  It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+  To set up a production-ready React build environment, follow these instructions:
+  * https://reactjs.org/docs/add-react-to-a-new-app.html
+  * https://reactjs.org/docs/add-react-to-an-existing-app.html
+
+  You can also use React without JSX, in which case you can remove Babel:
+  * https://reactjs.org/docs/react-without-jsx.html
+  * https://reactjs.org/docs/cdn-links.html
+-->
+</body>
+</html>
