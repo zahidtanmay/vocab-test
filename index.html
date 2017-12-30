@@ -130,7 +130,7 @@
 
         checkTime(){
             if(this.state.counter == 14){
-                this.props.changeQuestion()
+                this.props.changeQuestion(0)
             }
         }
         componentDidUpdate() {
@@ -200,7 +200,8 @@
         decision(){
 
             if(this.state.isToggleOn){
-                this.props.increaseCount()
+                this.props.increaseCount(this.props.button)
+
             }else {
                 this.props.decreaseCount()
             }
@@ -209,7 +210,7 @@
             let bgColor = this.state.isToggleOn ? "green" : "white"
             return (
                 <div className="col-md-6 text-center btn-div">
-                    <a style={{backgroundColor: bgColor}} onClick={this.handleClick} type="button" className="btn" href="#">{this.state.option}</a>
+                    <a style={{backgroundColor: bgColor}} onClick={this.handleClick} type="button" className="btn" >{this.state.option}</a>
                 </div>
             );
         }
@@ -218,7 +219,7 @@
     class Choices extends React.Component {
         constructor(props) {
             super(props);
-            this.state = {count:0, choices : this.props.choices };
+            this.state = {count:0, choices : this.props.choices, buttonSelected: [], answers: this.props.answers };
             this.onIncreaseCount = this.onIncreaseCount.bind(this);
             this.onDecreaseCount = this.onDecreaseCount.bind(this);
         }
@@ -230,19 +231,17 @@
         componentWillReceiveProps(nextProps) {
 
             if(this.state.choices != nextProps.choices){
-                this.setState({choices: nextProps.choices, count: 0});
+                this.setState({choices: nextProps.choices, count: 0, answers: nextProps.answers, buttonSelected: []});
             }
 
         }
 
-        onIncreaseCount(){
-            console.log('increase count')
+        onIncreaseCount(button){
             this.setState(prevState=>({
-                count: prevState.count + 1
+                count: prevState.count + 1, buttonSelected: this.state.buttonSelected.concat([button])
             }),this.decision)
         }
         onDecreaseCount(){
-            console.log('decrease count')
             this.setState(prevState=>({
                 count: prevState.count - 1
             }),this.decision)
@@ -250,14 +249,20 @@
 
         decision(){
             if(this.state.count == 2){
-                this.props.gotoNextQuestion()
+                var containsAll = this.state.answers.every(i => this.state.buttonSelected.includes(i))
+                if(containsAll){
+                    this.props.gotoNextQuestion(1)
+                }else {
+                    this.props.gotoNextQuestion(0)
+                }
+
             }
         }
 
         render(){
             var choices =this.state.choices;
             const listitem = choices.map((name, index) => {
-                return(<Choice increaseCount={this.onIncreaseCount} decreaseCount={this.onDecreaseCount} key={index} option={name} />);
+                return(<Choice increaseCount={this.onIncreaseCount} decreaseCount={this.onDecreaseCount} key={index} button={index+1} option={name} />);
             });
 
             return (
@@ -272,7 +277,7 @@
 
         constructor(props) {
             super(props);
-            this.state = {data: [], current: 1}
+            this.state = {data: [], current: 1, last: 5}
             this.nextQuestion = this.nextQuestion.bind(this)
         }
 
@@ -288,10 +293,16 @@
         }
 
 
-        nextQuestion(){
-            this.setState(prevState=>({
-                current: prevState.current+1
-            }), this.getNextQuestion);
+        nextQuestion(marks){
+            console.log(marks+' marks added')
+            if((this.state.current + 1) > this.state.last){
+                console.log('tests ends here')
+            }else{
+                this.setState(prevState=>({
+                    current: prevState.current+1
+                }), this.getNextQuestion);
+            }
+
         }
 
         getNextQuestion(){
@@ -309,6 +320,7 @@
         render(){
             let question = this.state.data.question
             let choices = [this.state.data.choice_one, this.state.data.choice_two, this.state.data.choice_three, this.state.data.choice_four]
+            let answer = [this.state.data.answer_one, this.state.data.answer_two]
             if(!Object.keys(this.state.data).length){
                 return null;
             }
@@ -320,8 +332,8 @@
                     </div>
                     <div className="row question-div"><Question changeQuestion={this.nextQuestion}  question={question} /></div>
                     <div className="row instruction-div"><Instruction  /></div>
-                    <div className="row choice-div"><Choices choices={choices} gotoNextQuestion={this.nextQuestion} /></div>
-                    {question}{choices}
+                    <div className="row choice-div"><Choices choices={choices} answers={answer} gotoNextQuestion={this.nextQuestion} /></div>
+                    {question}{choices}{answer}
                 </div>
 
             );
