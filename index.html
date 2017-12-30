@@ -112,7 +112,10 @@
         }
 
         componentDidMount(){
-
+            this.timerID = setInterval(
+                () => this.tick(),
+                10000
+            );
         }
         componentDidUpdate() {
 
@@ -150,8 +153,20 @@
 
         constructor(props) {
             super(props);
-            this.state = {isToggleOn: false, selectCount:0};
+            this.state = {isToggleOn: false, option: this.props.option};
             this.handleClick = this.handleClick.bind(this);
+        }
+
+        componentDidMount(){
+
+        }
+
+        componentWillReceiveProps(nextProps){
+            if(this.state.option != nextProps.option){
+                this.setState({
+                    option: nextProps.option, isToggleOn: false
+                })
+            }
         }
 
 //on click color change and trigger increase or decrease count upon click
@@ -162,6 +177,7 @@
             ),this.decision);
         }
         decision(){
+
             if(this.state.isToggleOn){
                 this.props.increaseCount()
             }else {
@@ -172,7 +188,7 @@
             let bgColor = this.state.isToggleOn ? "green" : "white"
             return (
                 <div className="col-md-6 text-center btn-div">
-                    <a style={{backgroundColor: bgColor}} onClick={this.handleClick} type="button" className="btn" href="#">{this.props.option}</a>
+                    <a style={{backgroundColor: bgColor}} onClick={this.handleClick} type="button" className="btn" href="#">{this.state.option}</a>
                 </div>
             );
         }
@@ -181,7 +197,7 @@
     class Choices extends React.Component {
         constructor(props) {
             super(props);
-            this.state = {count:0,choices : this.props.choices };
+            this.state = {count:0, choices : this.props.choices };
             this.onIncreaseCount = this.onIncreaseCount.bind(this);
             this.onDecreaseCount = this.onDecreaseCount.bind(this);
         }
@@ -191,7 +207,11 @@
         }
 
         componentWillReceiveProps(nextProps) {
-            this.setState({choices: nextProps.choices});
+
+            if(this.state.choices != nextProps.choices){
+                this.setState({choices: nextProps.choices, count: 0});
+            }
+
         }
 
         onIncreaseCount(){
@@ -208,9 +228,7 @@
         }
 
         decision(){
-            console.log('count from decision', this.state.count)
             if(this.state.count == 2){
-                console.log('no returning back')
                 this.props.gotoNextQuestion()
             }
         }
@@ -237,16 +255,8 @@
             this.nextQuestion = this.nextQuestion.bind(this)
         }
 
-        getInitialState() {
-            console.log('initial state')
-            return {
-
-            };
-        }
-
         componentDidMount() {
             var self = this;
-
             axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
                 .then(response => {
                         self.setState({
@@ -255,11 +265,9 @@
                     }
                 )
 
-
-
             this.timerID = setInterval(
                 () => this.tick(),
-                10000
+                15000
             );
         }
 
@@ -270,8 +278,16 @@
         tick() {
             this.setState(prevState=>({
                 current: prevState.current+1
-            }));
-            console.log(this.state.current)
+            }), this.getNextQuestion);
+        }
+
+        nextQuestion(){
+            this.setState(prevState=>({
+                current: prevState.current+1
+            }), this.getNextQuestion);
+        }
+
+        getNextQuestion(){
             var self = this;
             axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
                 .then(response => {
@@ -282,20 +298,6 @@
                 )
         }
 
-        nextQuestion(){
-            this.setState(prevState=>({
-                current: prevState.current+1
-            }));
-            console.log(this.state.current)
-            var self = this;
-            axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
-                .then(response => {
-                        self.setState({
-                            data: response.data
-                        })
-                    }
-                )
-        }
 
         render(){
             let question = this.state.data.question
@@ -312,6 +314,7 @@
                     <div className="row question-div"><Question  question={question} /></div>
                     <div className="row instruction-div"><Instruction  /></div>
                     <div className="row choice-div"><Choices choices={choices} gotoNextQuestion={this.nextQuestion} /></div>
+                    {question}{choices}
                 </div>
 
             );
