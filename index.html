@@ -1,79 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bulows Wortschatz Test</title>
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <style>
-    .header{
-      border-bottom: 5px solid black;
-      margin-bottom: 20px;
-    }
-    .title-p{
-      padding-bottom: 0px !important;
-      margin-bottom: -10px;
-    }
-    .red-text{
-      font-size: 60px;
-      font-weight: bold;
-      color: red;
-    }
-    .black-text{
-      font-weight: bold;
-      font-size: 25px;
-    }
-    .green-text{
-      font-size: 35px;
-      font-weight: 600;
-      color: green;
-    }
-    .icon-image{
-      height: 50px;
-      float: right;
-    }
-    .icon-image-div{
-      padding-top: 25px;
-    }
-    .question-div{
-      background-color: aliceblue;
-      min-height: 20%;
-    }
-    .instruction-div{
-      background-color: goldenrod;
-      margin-top: 20px;
-    }
-    .choice-div{
-      margin-top: 30px;
-    }
-    .zero-padding{
-      padding: 0 !important;
-      margin: 0 !important;
-    }
-    .btn-div{
-      margin-top: 15px;
-      margin-bottom: 15px;
-    }
-    .btn{
-      width: 80%;
-      font-weight: bold;
-      font-size: 30px;
-      color: black;
-    }
-    .btn:hover{
-      background-color: aquamarine;
-    }
-    .btn:focus{
-      box-shadow: 0 0 0 0 !important;
-      /*background-color: green;*/
-      /*color: white;*/
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulows Wortschatz Test</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        .header{
+            border-bottom: 5px solid black;
+            margin-bottom: 20px;
+        }
+        .title-p{
+            padding-bottom: 0px !important;
+            margin-bottom: -10px;
+        }
+        .red-text{
+            font-size: 60px;
+            font-weight: bold;
+            color: red;
+        }
+        .black-text{
+            font-weight: bold;
+            font-size: 25px;
+        }
+        .green-text{
+            font-size: 35px;
+            font-weight: 600;
+            color: green;
+        }
+        .icon-image{
+            height: 50px;
+            float: right;
+        }
+        .icon-image-div{
+            padding-top: 25px;
+        }
+        .question-div{
+            background-color: aliceblue;
+            min-height: 20%;
+        }
+        .instruction-div{
+            background-color: goldenrod;
+            margin-top: 20px;
+        }
+        .choice-div{
+            margin-top: 30px;
+        }
+        .zero-padding{
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .btn-div{
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .btn{
+            width: 80%;
+            font-weight: bold;
+            font-size: 30px;
+            color: black;
+        }
+        .btn:hover{
+            background-color: aquamarine;
+        }
+        .btn:focus{
+            box-shadow: 0 0 0 0 !important;
+            /*background-color: green;*/
+            /*color: white;*/
+        }
 
-  </style>
+    </style>
 </head>
 <body>
 <div id="root"></div>
@@ -108,21 +108,42 @@
     class Question extends React.Component {
         constructor(props) {
             super(props);
-            this.state = {question: this.props.question};
+            this.state = {question: this.props.question, counter: 0};
         }
 
         componentDidMount(){
             this.timerID = setInterval(
                 () => this.tick(),
-                10000
+                1000
             );
+        }
+        componentWillUnmount() {
+            clearInterval(this.timerID);
+        }
+
+        tick(){
+            this.setState(prevState=>({
+                counter: prevState.counter + 1
+
+            }), this.checkTime)
+        }
+
+        checkTime(){
+            if(this.state.counter == 14){
+                this.props.changeQuestion()
+            }
         }
         componentDidUpdate() {
 
         }
         //after six seconds question changes. for re-rendering dom of question part. dynamic
         componentWillReceiveProps(nextProps) {
-            this.setState({question: nextProps.question});
+            clearInterval(this.timerID);
+            this.setState({question: nextProps.question, counter:0});
+            this.timerID = setInterval(
+                () => this.tick(),
+                1000
+            );
         }
 
         render(){
@@ -172,8 +193,8 @@
 //on click color change and trigger increase or decrease count upon click
         handleClick() {
             this.setState(prevState => ({
-                isToggleOn: !prevState.isToggleOn
-            }
+                    isToggleOn: !prevState.isToggleOn
+                }
             ),this.decision);
         }
         decision(){
@@ -264,22 +285,8 @@
                         })
                     }
                 )
-
-            this.timerID = setInterval(
-                () => this.tick(),
-                15000
-            );
         }
 
-        componentWillUnmount() {
-            clearInterval(this.timerID);
-        }
-
-        tick() {
-            this.setState(prevState=>({
-                current: prevState.current+1
-            }), this.getNextQuestion);
-        }
 
         nextQuestion(){
             this.setState(prevState=>({
@@ -311,7 +318,7 @@
                         <Header />
                         <Hicon/>
                     </div>
-                    <div className="row question-div"><Question  question={question} /></div>
+                    <div className="row question-div"><Question changeQuestion={this.nextQuestion}  question={question} /></div>
                     <div className="row instruction-div"><Instruction  /></div>
                     <div className="row choice-div"><Choices choices={choices} gotoNextQuestion={this.nextQuestion} /></div>
                     {question}{choices}
