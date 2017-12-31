@@ -11,7 +11,7 @@
     <style>
 
         body{
-            background-color: #dce6f2;
+            background-color: darkolivegreen;
             background-image: url('src/img/pen_logo.png');
             background-repeat: no-repeat;
             background-position-x: center;
@@ -55,10 +55,14 @@
             font-size: 80px;
         }
         .form-label{
-            font-size: 35px;
+            font-size: 24px;
         }
         .form-group input{
-            background-color: yellow;
+            background-color: #ccccff;
+            border-radius: 0;
+        }
+        .form-group textarea{
+            background-color: #ccccff;
             border-radius: 0;
         }
         .start-btn{
@@ -90,61 +94,22 @@
         <div class="col-md-3">
             <form>
                 <div class="form-group">
-                    <label class="form-label" for="name">Name</label>
-                    <input type="text" class="form-control" id="name" >
+                    <label class="form-label" for="punkte">Ergebnis : Punkte</label>
+                    <input type="text" class="form-control" id="punkte" >
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="vorname">Vorname</label>
-                    <input type="text" class="form-control" id="vorname">
+                    <label class="form-label" for="einstufung" >Ergebnis : Einstufung</label>
+                    <textarea type="text" class="form-control" id="einstufung" rows="3"></textarea>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="row start-div" id="root"></div>
 
 </div>
-
-<script type="text/babel">
-
-    class App extends React.Component{
-        constructor(props) {
-            super(props);
-            this.handleClick = this.handleClick.bind(this);
-        }
-
-        handleClick(){
-            var self = this;
-            var name = document.getElementById('name').value;
-            var vorname = document.getElementById('vorname').value;
-
-            if (typeof(Storage) !== "undefined") {
-                sessionStorage.setItem("name", name);
-                sessionStorage.setItem("vorname", vorname);
-                sessionStorage.setItem('current', 1);
-                sessionStorage.setItem('score', 0);
-            } else {
-                console.log('Oh no!')
-            }
-
-            window.location.href = "test.html";
-        }
-
-        render(){
-            return(
-                <div className="col-md-12 btn-div">
-                    <a href="#" className="start-btn" onClick={this.handleClick}>START</a>
-                </div>
-            )
-        }
-    }
-
-
-
-    ReactDOM.render(
-        <App />,
-        document.getElementById('root')
-    );
+<script>
+    console.log(sessionStorage.getItem('score')+' '+sessionStorage.getItem('current'))
+    document.getElementById("punkte").value = sessionStorage.getItem('score');
 </script>
 
 </body>
