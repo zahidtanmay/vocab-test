@@ -279,12 +279,19 @@
             super(props);
             var current = parseInt(sessionStorage.getItem('current'))
             console.log(current)
-            this.state = {data: [], current: current, last: 20}
+            this.state = {data: [], current: current, last:0}
             this.nextQuestion = this.nextQuestion.bind(this)
         }
 
         componentDidMount() {
             var self = this;
+            axios.get(`http://127.0.0.1:8000/api/question_count`)
+                .then(response => {
+                        self.setState({
+                            last: response.data
+                        })
+                    }
+                )
             axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
                 .then(response => {
                         self.setState({
@@ -296,9 +303,12 @@
 
 
         nextQuestion(marks){
-            console.log(marks+' marks added')
+            var score = parseInt(sessionStorage.getItem('score'))
+            score = score + marks;
+            sessionStorage.setItem('score', score)
+            // console.log('score', score)
             if((this.state.current + 1) > this.state.last){
-                console.log('tests ends here')
+                window.location.href = "end.html";
             }else{
                 this.setState(prevState=>({
                     current: prevState.current+1
@@ -309,7 +319,7 @@
 
         getNextQuestion(){
             var self = this;
-            console.log(this.state.current)
+            // console.log(this.state.current)
             sessionStorage.setItem('current', this.state.current)
             axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
                 .then(response => {

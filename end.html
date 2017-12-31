@@ -53,6 +53,7 @@
         }
         .heading-text{
             font-size: 80px;
+            color: white;
         }
         .form-label{
             font-size: 24px;
@@ -81,6 +82,9 @@
         .btn-div{
             padding-left: 15%;
         }
+        label{
+            color: white;
+        }
 
 
     </style>
@@ -108,8 +112,20 @@
 
 </div>
 <script>
-    console.log(sessionStorage.getItem('score')+' '+sessionStorage.getItem('current'))
-    document.getElementById("punkte").value = sessionStorage.getItem('score');
+    // console.log(sessionStorage.getItem('score')+' '+sessionStorage.getItem('current'))
+    var name = sessionStorage.getItem('name');
+    var first_name = sessionStorage.getItem('vorname');
+    var result_points = sessionStorage.getItem('score');
+    document.getElementById("punkte").value = result_points
+
+    var params = new URLSearchParams();
+    params.append('name', name);
+    params.append('first_name', first_name);
+    params.append('result_points',result_points );
+    axios.post('http://127.0.0.1:8000/api/tests', params)
+        .then(function (response) {
+        // console.log(response.data)
+    });
 </script>
 
 </body>
