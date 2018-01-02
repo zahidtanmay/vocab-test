@@ -285,14 +285,14 @@
 
         componentDidMount() {
             var self = this;
-            axios.get(`http://127.0.0.1:8000/api/question_count`)
+            axios.get(`http://103.4.145.246/vocab-admin/api/question_count`)
                 .then(response => {
                         self.setState({
                             last: response.data
                         })
                     }
                 )
-            axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
+            axios.get(`http://103.4.145.246/vocab-admin/api/questions/${this.state.current}`)
                 .then(response => {
                         self.setState({
                             data: response.data
@@ -321,7 +321,7 @@
             var self = this;
             // console.log(this.state.current)
             sessionStorage.setItem('current', this.state.current)
-            axios.get(`http://127.0.0.1:8000/api/questions/${this.state.current}`)
+            axios.get(`http://103.4.145.246/vocab-admin/api/questions/${this.state.current}`)
                 .then(response => {
                         self.setState({
                             data: response.data
